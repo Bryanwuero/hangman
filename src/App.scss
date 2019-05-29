@@ -1,20 +1,13 @@
-.App {
-  text-align: center;
+
+.app {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
 }
 
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.layout {
+.layout, .header, .instructions {
   text-align: center;
   position: relative;
   margin: 0 25%;
@@ -33,14 +26,17 @@
   margin-right: 10px;
   width: 26px;
   text-transform: uppercase;
+  li, .guess-visible {
+    visibility: visible;
+  }
+  li, .guess {
+    visibility: hidden;
+  }
 }
 
-.guess {
-  visibility: hidden;
-}
-
-span, .guess-visible {
-  visibility: visible;
+th, td {
+  border: 1px solid black;
+  text-align: center;
 }
 
 .board {

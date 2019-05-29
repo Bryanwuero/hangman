@@ -5,26 +5,35 @@ class Layout extends Component {
   constructor () {
     super()
     this.state = {
-      lives: 7,
-      guesses: 0,
+      lives: 0,
+      won: 0,
+      lost: 0,
       split: [],
+      splt: [],
+      chosen: false,
       hasWord: false,
-      // word: [],
-      // letters: 0,
-      // letter: '',
       key: []
     }
   }
 
-  componentDidMount = () => {
+  newGame = () => {
     const random = randomWords()
     const letter = random.split('')
     this.setState({
       split: letter,
+      splt: [],
+      chosen: false,
+      lives: 7,
+      key: [],
+      hasWord: false
     })
+  }
+  componentDidMount = () => {
+    this.newGame()
   }
 
   onKeyPressed = (e) =>{
+    // Cheks if he chooses a repeated chossen letter
     const key = this.state.key.slice(0)
     key.push(e.key)
     if (!this.state.key.includes(e.key)) {
@@ -32,27 +41,71 @@ class Layout extends Component {
         key: key
       })
     } else {
-      console.log('already chose word!')
+      this.setState({
+        chosen: true
+      })
     }
-    console.log('split', this.state.split)
-    if ((this.state.split).includes(e.key)) {
+    // Cheks if the random word array has the the key(letter) pressed
+    if (this.state.split.includes(e.key)) {
       this.setState({
         hasWord: true
       })
+      for(var word of this.state.split) {
+        if((word === e.key) && !this.state.chosen) {
+          this.state.splt.push(word)
+          if(this.state.splt.length === this.state.split.length) {
+            this.youWin()
+          }
+        }
+      }
+    }
+    else { 
+      this.setState({
+        lives: this.state.lives-1,
+        hasWord: false
+      })
+      if (this.state.lives <= 1) {
+        this.gameOver()
+      } 
+    }
+  }
+
+  youWin = () => {
+    this.setState({
+      won: this.state.won+1
+    })
+    if (window.confirm('You Win! \n Do you what to play Again?')){
+      this.componentDidMount()
+    }else {
+      console.log('NO :(')
+    }
+  }
+
+  gameOver = () => {
+    this.setState({
+      lost: this.state.lost+1
+    })
+    if (window.confirm('Game Over \n Do you want to play again?')){
+      this.componentDidMount()
+    }else {
+      console.log('NO :(')
     }
   }
   render () {
     const entries = this.state.split
     const character = this.state.key
     const visible = this.state.hasWord ? 'guess-visible' : 'guess'
+    const guesses = this.state.lives
     return (
-      <div onKeyDown={(e) => this.onKeyPressed(e)} tabIndex='0'>
-        <h1>Hangman Game</h1>
-        <h3>Guess the word</h3>
+      <div onKeyDown={(e) => this.onKeyPressed(e)} tabIndex='0' className='app'>
+        <div className='header'>
+          <h1>Hangman Game</h1>
+          <h3>Guess the word</h3>
+        </div>
         <section className='layout'>
           <ol className='word'>
-            { entries.map((letters) => 
-              <li className='letter' key={letters}><span className={visible}>{letters}</span></li>
+            { entries.map((letters, index) => 
+              <li className='letter' key={index} ><span className={visible} >{letters}</span></li>
             )}
           </ol>
         </section>
@@ -61,22 +114,33 @@ class Layout extends Component {
             <thead>
               <tr>
                 <th>Letters</th>
-                <th>Lives</th>
                 <th>Guesses</th>
+                <th>Win</th>
+                <th>Lost</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td> 
-                  { character.map((char) => 
-                    <li className='chars' key={char}><span>{char}</span></li>
+                  { character.map((char, index) => 
+                    <li className='chars' key={index}><span>{char}</span></li>
                   )}
                 </td>
-                <td>7</td>
-                <td>1</td>
+                <td>{guesses}</td>
+                <td>{this.state.won}</td>
+                <td>{this.state.lost}</td>
               </tr>
             </tbody>
           </table>
+        </div>
+        <div className='instructions'>
+          <h2>Instructions</h2>
+          <ul>
+            <li>Click on the screen to start playing</li>
+            <li>Click on any key letter of the english alphabet to guess the word</li>
+            <li>If the letter is correct it would appear if not you will loose 1 live</li>
+            <li>Every time you loose or win you will beasked if you want to played again </li>
+          </ul>
         </div>
       </div>
     )
